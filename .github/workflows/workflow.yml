@@ -9,10 +9,22 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      example_input:
-        description: 'An example input for the workflow'
+      instanceName:
+        description: 'Name of the instance'
+        required: true
+        default: 'default-instance'
+      awsRegion:
+        description: 'AWS region to deploy resources'
+        required: true
+        default: 'us-east-1'
+      instanceType:
+        description: 'Type of instance'
+        required: true
+        default: 't2.micro'
+      action:
+        description: 'Action to perform'
         required: false
-        default: 'default_value'
+        default: 'apply'
 
 jobs:
   terraform:
