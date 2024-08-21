@@ -44,14 +44,22 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1  # Replace with your desired AWS region
-        
+        aws-region: ${{ github.event.inputs.awsRegion }} # Use input value for region
+
     - name: Terraform Init
       run: terraform init
 
     - name: Terraform Plan
-      run: terraform plan
+      run: |
+        terraform plan \
+          -var "instance_name=${{ github.event.inputs.instanceName }}" \
+          -var "aws_region=${{ github.event.inputs.awsRegion }}" \
+          -var "instance_type=${{ github.event.inputs.instanceType }}"
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve
-
+      if: ${{ github.event.inputs.action == 'apply' }}
+      run: |
+        terraform apply -auto-approve \
+          -var "instance_name=${{ github.event.inputs.instanceName }}" \
+          -var "aws_region=${{ github.event.inputs.awsRegion }}" \
+          -var "instance_type=${{ github.event.inputs.instanceType }}"
