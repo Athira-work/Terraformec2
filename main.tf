@@ -1,3 +1,5 @@
+# main.tf
+
 terraform {
   required_providers {
     aws = {
@@ -10,15 +12,14 @@ terraform {
 }
 
 provider "aws" {
-  region  = "us-east-1"
+  region = var.aws_region
 }
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-04a81a99f5ec58529"
-  instance_type = "t2.micro"
+  ami           = var.ami
+  instance_type = var.instance_type
 
   tags = {
-    Name = "ExampleAppServerInstance"
+    Name = var.instance_name
   }
 }
-
