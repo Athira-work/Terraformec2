@@ -29,22 +29,27 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ github.event.inputs.awsRegion || 'us-east-1' }}
+      AMI: ${{ github.event.inputs.ami || 'ami-04a81a99f5ec58529' }}
+      INSTANCE_TYPE: ${{ github.event.inputs.instanceType || 't2.micro' }}
+      INSTANCE_NAME: ${{ github.event.inputs.instanceName || 'default-instance' }}
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.4.0
 
     - name: Set up AWS CLI
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ github.event.inputs.awsRegion }} # Use input value for region
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.4.0
 
     - name: Terraform Init
       run: terraform init
@@ -52,14 +57,16 @@ jobs:
     - name: Terraform Plan
       run: |
         terraform plan \
-          -var "instance_name=${{ github.event.inputs.instanceName }}" \
-          -var "aws_region=${{ github.event.inputs.awsRegion }}" \
-          -var "instance_type=${{ github.event.inputs.instanceType }}"
+          -var "aws_region=${{ env.AWS_REGION }}" \
+          -var "ami=${{ env.AMI }}" \
+          -var "instance_type=${{ env.INSTANCE_TYPE }}" \
+          -var "instance_name=${{ env.INSTANCE_NAME }}"
 
     - name: Terraform Apply
       if: ${{ github.event.inputs.action == 'apply' }}
       run: |
         terraform apply -auto-approve \
-          -var "instance_name=${{ github.event.inputs.instanceName }}" \
-          -var "aws_region=${{ github.event.inputs.awsRegion }}" \
-          -var "instance_type=${{ github.event.inputs.instanceType }}"
+          -var "aws_region=${{ env.AWS_REGION }}" \
+          -var "ami=${{ env.AMI }}" \
+          -var "instance_type=${{ env.INSTANCE_TYPE }}" \
+          -var "instance_name=${{ env.INSTANCE_NAME }}"
