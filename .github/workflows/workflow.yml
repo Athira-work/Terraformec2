@@ -63,7 +63,7 @@ jobs:
           -var "instance_name=${{ env.INSTANCE_NAME }}"
 
     - name: Terraform Apply
-      if: ${{ github.event.inputs.action == 'apply' }}
+      if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply') }}
       run: |
         terraform apply -auto-approve \
           -var "aws_region=${{ env.AWS_REGION }}" \
