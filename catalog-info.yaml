@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: Terraformec2
+  annotations:
+    github.com/project-slug: Athira-work/Terraformec2
+spec:
+  type: other
+  lifecycle: unknown
+  owner: Athira-work
